@@ -6,7 +6,8 @@ import './login.less'
 //引入logo图片
 import logo from './images/logo.png'
 /* 
-    登陆的一级路由组件  
+    登陆的一级路由组件 
+    yyy 
 */
 
 const Item = Form.Item
