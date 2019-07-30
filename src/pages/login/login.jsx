@@ -6,8 +6,7 @@ import './login.less'
 //引入logo图片
 import logo from './images/logo.png'
 /* 
-    登陆的一级路由组件
-    antD的Form表单实现   
+    登陆的一级路由组件  
 */
 
 const Item = Form.Item
