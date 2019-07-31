@@ -10,7 +10,6 @@ import {Route,Switch,BrowserRouter} from 'react-router-dom'
 // 引入Login以及Admin一级路由组件
 import Login from './pages/login/login' 
 import Admin from './pages/admin/admin' 
-import './api/index'
 
 export default class App extends Component {
     
