@@ -1,10 +1,19 @@
 import React, { Component } from 'react'
 //引入antD表单
-import { Form, Icon, Input, Button } from 'antd';
+import { Form, Icon, Input, Button, message } from 'antd';
+import {Redirect} from 'react-router-dom'
+
 //引入login样式
 import './login.less'
 //引入logo图片
-import logo from './images/logo.png'
+import logo from '../../assets/images/logo.png'
+//引入发送登陆请求】
+import {reqLogin} from '../../api'
+//引入保存user对象的组件
+import memoryUtils from '../../utils/memoryUtils'
+//引入操作localStorage存取user的工具组件
+import {saveUser} from '../../utils/localStorageUtils'
+
 /* 
     登陆的一级路由组件 
 */
@@ -22,10 +31,28 @@ class Login extends Component {
         const values = this.props.form.getFieldsValue()//取出所有字段的值
         console.log(username,password,values) //tangyuanhang 123123 {username: "tangyuanhang", password: "123123"}*/
         //---------------设置表单点击提交按钮时统一验证
-        this.props.form.validateFields((err,values)=>{  //该方法用于验证所有字段，传入回调函数
+        this.props.form.validateFields(async (err,values)=>{  //该方法用于验证所有字段，传入回调函数
             //err是验证不通过的错误信息，values是表单所有字段的值
             if (!err) {
                 console.log('发送登录Ajax请求', values);//{username: "dsdsd", password: "dddddd"}
+                //发送登录请求
+                const {username,password} = values
+                const result = await reqLogin(username,password)//获取的result是一个json对象，{status：0，data：user对象}，{status：1，msg：错误信息}
+                if(result.status === 0){
+                    // 成功登录
+                    //保存用户信息
+                    const user = result.data
+                    //将用户信息保存到localStrorage，这样页面进行刷新用户信息还能够存在，不会直接销毁掉
+                    // localStorage.setItem('USER-KEY',JSON.stringify(user))
+                    saveUser(user)
+                    memoryUtils.user = user
+                    //跳转到admin界面
+                    this.props.history.replace('/')
+
+                }else{
+                    //登录失败,使用antD的message函数组件，展示错误信息
+                    message.error(result.msg)
+                }
             }
 
         })
@@ -60,6 +87,12 @@ class Login extends Component {
 
     render() {
         const { getFieldDecorator } = this.props.form;
+
+        //判断用户是否已近登录，也就是内存中的user是否有数据，如果有则不访问login页面，而是跳转到admin界面
+        if(memoryUtils.user._id){
+            return <Redirect to='/'/>
+        }
+
         return (
             <div className="login">
                 <header className="login-header">

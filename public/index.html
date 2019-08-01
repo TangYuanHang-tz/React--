@@ -6,8 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!-- 引入样式重置的css（当前引入方式有问题） -->
-    <link rel="stylesheet" href="./css/reset.css">
+    <!-- 引入样式重置的css（当前引入方式有问题,当出现多级路由的时候如/charts/pie，则发送请求http://localhost:3000/charts/pie）
+         会将http://localhost:3000/charts看作根目录，所以请求http://localhost:3000/charts/css/reset.css，所以报错
+         所以我们不因该href="./css/reset.css"而是href="/css/reset.css"不加点，表示到根目录下去找
+    -->
+    <link rel="stylesheet" href="/css/reset.css">
     <title>React App</title>
   </head>
   <body>
