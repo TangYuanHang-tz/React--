@@ -12,9 +12,11 @@ GET请求参数的两种方式
 
 //引入axios，用于发送请求
 import axios from 'axios'
+import {message} from 'antd'
+
 
 //暴露一个方法
-export default function ajax(url,data = {},method){
+export default function ajax(url,data = {},method="GET"){
 
     return new Promise((resolve,reject)=>{
         let promise
@@ -37,11 +39,10 @@ export default function ajax(url,data = {},method){
             },
             //3.如果失败，不调用reject（），因为如果绑定错误的数据（错误对象），则在外部还需要分别处理请求异常
             error =>{
-                alert('请求出错：' + error.message)
+                message.error('请求出错了: ' + error.message)
             }
         )
         
     })
-
-    
 }
+

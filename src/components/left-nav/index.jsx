@@ -93,7 +93,7 @@ class LeftNav extends Component {
         },[])
     } 
 
-    //在第一次render（）之前
+    //在第一次render（）之前(刷新时！！默认展开当前请求path所对应的Submenu)
     componentWillMount(){
         this.menuNodes = this.getMenuNodes2(menuList)
     }
