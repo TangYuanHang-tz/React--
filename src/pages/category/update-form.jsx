@@ -13,7 +13,7 @@ class UpdateForm extends Component {
     componentWillMount(){
         this.props.setForm(this.props.form)
     }
-
+    
     render() {
         const {getFieldDecorator} = this.props.form
         return (

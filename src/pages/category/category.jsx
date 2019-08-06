@@ -9,6 +9,10 @@ import {reqCategorys} from '../../api/index'
 import UpdateForm from './update-form'
 //引入发送更新请求
 import {reqUpdateCategory} from '../../api'
+//引入用来添加分类的自定义Form组件
+import AddForm from './add-form'
+//引入添加分类的请求
+import {reqAddCategory} from '../../api'
 
 /* 
 admin的二级路由组件--品类管理路由组件
@@ -30,13 +34,14 @@ export default class Category extends Component {
     }
 
     // 获取一级分类列表信息的方法---以及获取二级分类列表信息的方法
-    getCategorys = async ()=>{
+    //pId适用于添加分类后，确定更新获取一级列表还是二级列表的，如果有Pid就用Pid，如果没有就用状态中的
+    getCategorys = async (pId)=>{
         //发送请求之前需要加载图片的出现
         this.setState({loading:true})
 
         //---具体获取哪一个分类列表取决于状态中的parentId
         const {parentId} = this.state
-        const result = await reqCategorys(parentId)
+        const result = await reqCategorys(pId || parentId)  //如果有Pid就用Pid，如果没有就用状态中的
 
         //发送请求之后将其置为false
         this.setState({loading:false})
@@ -144,11 +149,46 @@ export default class Category extends Component {
                 })
             }
         })
-        
-
     }
 
-    // ----------------组件挂载前的生命周期方法
+    /* 
+        添加分类的方法
+    */
+   addCategory = async ()=>{
+    this.form.validateFields(async (err, values) => { //对表单进行验证
+        if(!err){
+            //获取AddForm组件中输入的参数
+            const {parentId,categoryName} = this.form.getFieldsValue()
+            // //重置输入控件的值
+            this.form.resetFields()
+            // 发送添加分类的请求
+            const result = await reqAddCategory(parentId,categoryName)   
+            if(result.status === 0 ){
+                message.success('成功添加分类信息！')
+                /* 
+                显示最新的分类列表的时候，需要对相应的情况做出判断：
+                如果是在二级列表中，添加的是一级列表，那么更新的是一级列表而不是二级列表
+                只有添加的分类是一级列表或者||添加的不是一级分类而是
+                */
+               if(parentId === '0'  ){
+                    //更新的一级分类列表
+                    this.getCategorys('0')
+               }else if(parentId === this.state.parentId){
+                    // 更新当前列表
+                    this.getCategorys()
+               }
+                
+            }
+            //关闭添加界面
+            this.setState({
+                showStatus : 0
+            })
+        }
+    })
+    
+   }
+
+    // --------------------------------组件挂载前的生命周期方法
     //为了数据的初始化，以及能够在按钮上绑定监听事件
     componentWillMount(){
         this.initColumns()
@@ -178,7 +218,8 @@ export default class Category extends Component {
             )
             //定义Card的右侧内容
             const extra = (
-                <Button type="primary">
+                //------------给右侧的添加按钮加上点击监听，点击的时候显示添加界面
+                <Button type="primary" onClick={()=>this.setState({showStatus:2})}>
                     <Icon type="plus"/>
                     添加
                 </Button>
@@ -205,9 +246,22 @@ export default class Category extends Component {
                     this.setState({showStatus : 0})
                 }}
                 >
-                
                     <UpdateForm categoryName={category.name} setForm={(form)=>this.form = form}/>
                 </Modal>
+
+                <Modal
+                title="添加分类"
+                visible={showStatus === 2}
+                onOk={this.addCategory}
+                onCancel={()=>{
+                    this.form.resetFields()
+                    this.setState({showStatus : 0})
+                }}
+                >
+                    {/* 将我们已经获取过的一级列表数组传递给AddForm组件用来动态显示列表数据 */}
+                    <AddForm categorys={categorys} parentId={parentId} setForm={(form)=>this.form = form}/>
+                </Modal>
+
             </Card>
 
             

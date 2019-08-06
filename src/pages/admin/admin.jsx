@@ -36,7 +36,7 @@ export default class Admin extends Component {
         }
 
         return (
-            <Layout style={{height:'100%'}}>
+            <Layout style={{minHeight:'100%'}}>
                 <Sider>
                     {/* 使用左侧导航组件 */}
                     <LeftNav/>

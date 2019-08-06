@@ -27,6 +27,29 @@ export const reqCategorys = (parentId) => ajax(BASE+"/manage/category/list",{par
 //4.更新分类名称
 export const reqUpdateCategory = ({categoryId,categoryName}) => ajax(BASE+'/manage/category/update',{categoryId,categoryName},'POST')
 
+//5.添加分类名称
+export const reqAddCategory = (parentId,categoryName) => ajax(BASE+'/manage/category/add',{parentId,categoryName},'POST')
+
+// 6.获取商品分页列表
+export const reqProducts = ({pageNum,pageSize}) => ajax(BASE+"/manage/product/list",{pageNum,pageSize})
+
+//7.根据商品名称或者商品描述来获取商品分页列表
+export const reqSearchProducts = ({
+    pageNum,
+    pageSize,
+    searchType, //该属性的值只能为productName或者productDesc，用来判断根据商品名称还是商品描述来获取商品分页列表
+    searchName  //查询的商品名称或商品描述值
+}) => ajax(BASE+'/manage/product/search',{
+    pageNum,
+    pageSize,
+    [searchType]:searchName
+})
+
+// 8.对商品进行上架/下架处理
+export const reqUpdateStatus =  (productId,status) => ajax(BASE+'/manage/product/updateStatus',{productId,status},'POST')
+
+// 9.根据分类ID获取分类
+export const reqCategory = (categoryId) => ajax(BASE+'/manage/category/info',{categoryId})
 
 
 
