@@ -84,7 +84,7 @@ export default class ProductDetail extends Component {
                         <span>
                             {/* 因为获取的imgs是一个图片数组，并且没有基础路劲，之后图片名，所以添加基础路径 */}
                             {
-                                imgs.map((img)=>{ return <img key={img} src={BASE_IMG_URL + img} alt='tupian'></img> })
+                                imgs.map(img => (<img style={{width:"150px",height:"120px"}} key={img} src={BASE_IMG_URL + img} alt='tupian'/> ))
                             }
                         </span>
                     </List.Item>

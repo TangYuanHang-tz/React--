@@ -51,6 +51,9 @@ export const reqUpdateStatus =  (productId,status) => ajax(BASE+'/manage/product
 // 9.根据分类ID获取分类
 export const reqCategory = (categoryId) => ajax(BASE+'/manage/category/info',{categoryId})
 
+// 10.删除图片
+export const reqDelteImg = (name) => ajax(BASE+'/manage/img/delete',{name},'POST')
+
 
 
 
