@@ -5,12 +5,13 @@ import {
   Form,
   Input,
   Button,
-  Cascader
+  Cascader,
+  message
 } from 'antd'
 
 import LinkButton from '../../components/link-button'
 //移入获取分类列表的方法
-import { reqCategorys } from '../../api'
+import { reqCategorys,reqAddOrUpdateProduct } from '../../api'
 //引入图片上传组件
 import PicturesWall from './pictures-wall'
 //引入富文本编辑器组件---还需要引入相应样式
@@ -52,9 +53,18 @@ class ProductAddUpdate extends Component {
 
     //--------点击提交进行统一校验
     submit = ()=>{
-        this.props.form.validateFields((err, values) => {
+        this.props.form.validateFields( async (err, values) => {
             if (!err) {
-              
+                // 1.根绝页面的输入，准备一个product对象
+                const { name,desc,price,categoryIds } = values
+                let pCategoryId , categoryId
+                if(categoryIds.length === 1){
+                  pCategoryId = '0'
+                  categoryId = categoryIds[0]
+                }else{
+                  pCategoryId = categoryIds[0]
+                  categoryId = categoryIds[1]
+                }
 
                 //读取所有上传图片的文件名数组（方法有子组件提供，父组件通过获取子组件对象来调用）
                 const imgs = this.pwRef.current.getImgs()
@@ -62,7 +72,30 @@ class ProductAddUpdate extends Component {
                 //读取富文本内容（html格式的字符串）
                 const detail = this.editorRef.current.getDetail() 
 
-                console.log('Received values of form: ', values,imgs,detail);
+                const product = {
+                  name,
+                  desc,
+                  price,
+                  categoryId,
+                  pCategoryId,
+                  imgs,
+                  detail
+                }
+                //如果是更新则，需要制定_id属性
+                if(this.isUpdate){
+                  product._id = this.product._id
+                }
+
+                // console.log('Received values of form: ', values,imgs,detail);
+
+                // 2.发送请求，添加或者修改商品
+                const result = await reqAddOrUpdateProduct(product)
+
+                //3.根据结果，进行相应
+                if(result.status === 0){
+                  message.success((this.isUpdate?'修改':'添加')+'商品成功')
+                  this.props.history.goBack()
+                }
             }
         })
     }

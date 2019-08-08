@@ -7,6 +7,7 @@ import './index.less'
 import logo from '../../assets/images/logo.png'
 //引入menulist用于动态生成item，submenu组件来构成菜单
 import menuList from '../../config/menuConfig'
+import  memoryUtils from '../../utils/memoryUtils'
 
 //SubMenu是二级菜单，Item是菜单中的每一项
 const { SubMenu,Item } = Menu;
@@ -15,6 +16,32 @@ const { SubMenu,Item } = Menu;
 Admin的左侧导航组件
 */
 class LeftNav extends Component {
+
+    /* 
+        -----判断当前用户是否有指定item的权限
+    */
+   hasAuth = (item) => {
+    //获取当前用户
+    const user = memoryUtils.user
+    // 1.如果当前用户是admin，直接返回true
+    // 2.如果当前item被标注为公开，那么也返回true
+    // 3.判断当前的item在不在当前用户对应的角色的的item权限列表中
+    if(user.username === 'admin' || item.isPublic || user.role.menus.indexOf(item.key) !== -1){
+        return true
+    }else if(item.children){
+        //4.如果我拥有某个item的子节点的权限例如：/charts/bar（柱形图），那么权限列表中显示的就只有/charts/bar而不会再有单独的上级key：/charts
+        //那么我们进行判断的时候没有/charts直接返回false，里面的子节点也全部没有。所以我们还需要判断，如果我们有某个子节点的权限，那么他的父节点
+        //权限我们也得有
+         const cItem = item.children.find(cItem => user.role.menus.indexOf(cItem.key) !== -1)
+         if(cItem){
+            return true
+         }
+    }
+    
+    return false
+    
+   }
+   
 
     //根据menuList生成item，sunmenu组件标签，用于构建菜单
     //第一种实现：关键在于array的map方法以及递归执行
@@ -57,38 +84,42 @@ class LeftNav extends Component {
         const path = this.props.location.pathname
 
         return menuList.reduce((pre,item)=>{
-            //添加Item标签
-            if(!item.children){
-                pre.push(
-                    <Item key={item.key}>  
-                        <Link to={item.key}>
-                            <Icon type={item.icon} />  
-                            <span>{item.title}</span>
-                        </Link>
-                    </Item>
-                )
-            }else{
-                //如果当前请求的是当前item的children中某个item对应的path。当前item的key就是openKey
-                // const cItem = item.children.find((cItem,index)=>cItem.key===path)
-                const cItem = item.children.find((cItem,index)=>path.indexOf(cItem.key)===0)//----------product商品详情路径不匹配问题
-                if(cItem){
-                    this.openKey = item.key
-                }
-                pre.push(
-                    <SubMenu
-                    key={item.key}
-                    title={
-                    <span>
-                        <Icon type={item.icon} />
-                        <span>{item.title}</span>
-                    </span>
+            
+            // ----------------------------------只有当前的用户拥有此item对应的权限的时候，才显现这个item
+            if(this.hasAuth(item)){
+                 //添加Item标签
+                if(!item.children){
+                    pre.push(
+                        <Item key={item.key}>  
+                            <Link to={item.key}>
+                                <Icon type={item.icon} />  
+                                <span>{item.title}</span>
+                            </Link>
+                        </Item>
+                    )
+                }else{
+                    //如果当前请求的是当前item的children中某个item对应的path。当前item的key就是openKey
+                    // const cItem = item.children.find((cItem,index)=>cItem.key===path)
+                    const cItem = item.children.find((cItem,index)=>path.indexOf(cItem.key)===0)//----------product商品详情路径不匹配问题
+                    if(cItem){
+                        this.openKey = item.key
                     }
-                    >
-                        {
-                            this.getMenuNodes2(item.children)
+                    pre.push(
+                        <SubMenu
+                        key={item.key}
+                        title={
+                        <span>
+                            <Icon type={item.icon} />
+                            <span>{item.title}</span>
+                        </span>
                         }
-                    </SubMenu>
-                )
+                        >
+                            {
+                                this.getMenuNodes2(item.children)
+                            }
+                        </SubMenu>
+                    )
+                }
             }
             return pre
         },[])

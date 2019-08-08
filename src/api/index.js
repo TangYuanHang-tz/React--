@@ -54,6 +54,27 @@ export const reqCategory = (categoryId) => ajax(BASE+'/manage/category/info',{ca
 // 10.删除图片
 export const reqDelteImg = (name) => ajax(BASE+'/manage/img/delete',{name},'POST')
 
+// 11.添加或者修改商品
+export const reqAddOrUpdateProduct = (product) => ajax(BASE+'/manage/product/'+(product._id ? 'update' : 'add'),product,'POST')
+
+//12. 添加角色
+export const reqAddRole = (roleName) => ajax('/manage/role/add', {roleName}, 'POST')
+
+//13. 获取角色列表
+export const reqRoles = () => ajax('/manage/role/list')
+
+//14. 更新角色(给角色设置权限)
+export const reqUpdateRole = (role) => ajax('/manage/role/update', role, 'POST')
+
+//15. 添加/更新用户
+export const reqAddOrUpdateUser = (user) => ajax('/manage/user/'+(user._id ? 'update' : 'add'), user, 'POST')
+
+//16. 获取用户列表
+export const reqUsers = () => ajax('/manage/user/list')
+
+//17. 删除用户
+export const reqDeleteUser = (userId) => ajax('/manage/user/delete', {userId}, 'POST')
+
 
 
 
